@@ -45,10 +45,9 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
             recyclerView.setAdapter(recyclerViewAdapter);
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
-                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    if ((linearLayoutManager.getItemCount() - recyclerView.getChildCount()) <= linearLayoutManager.findFirstVisibleItemPosition()) {
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if (!recyclerView.canScrollVertically(1)) {//就很牛逼的判断方法 canSrollVertically -1往下 1往上
                         mainPresenter.getBeforeData(recyclerViewAdapter.getDate());
                     }
                 }

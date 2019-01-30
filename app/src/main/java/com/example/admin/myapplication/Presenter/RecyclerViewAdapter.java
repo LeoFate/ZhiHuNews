@@ -32,7 +32,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     private List<Object> mainList = new ArrayList<>();
     private List<InfoBean.TopStoriesBean> topList = new ArrayList<>();
     private List<Banner> bannerList = new ArrayList<>();
-    private Queue<String> dateList = new LinkedList<>();
+    private List<String> dateList = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
 
     public RecyclerViewAdapter(@NonNull InfoBean infoBean) {
@@ -53,7 +53,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public String getDate() {
-        return dateList.element();
+        return dateList.get(dateList.size()-1);
     }
 
     @Override

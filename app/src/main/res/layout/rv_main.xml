@@ -11,13 +11,19 @@
     android:orientation="horizontal">
     <TextView
         android:id="@+id/rv_main_text"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:layout_width="0dp"
+        android:layout_weight="3"
         android:layout_height="match_parent"
-        android:layout_weight="3"/>
+        android:textSize="20sp"
+        android:textColor="#5C3317" />
     <ImageView
         android:id="@+id/rv_main_image"
+        android:layout_margin="10dp"
+        android:layout_gravity="center_vertical"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:layout_height="match_parent" />
 </LinearLayout>
 </android.support.v7.widget.CardView>
