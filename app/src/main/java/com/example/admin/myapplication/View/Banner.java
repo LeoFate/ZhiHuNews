@@ -1,5 +1,6 @@
 package com.example.admin.myapplication.View;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,8 +16,13 @@ import com.example.admin.myapplication.MyApplication;
 import com.example.admin.myapplication.R;
 
 public class Banner extends Fragment implements Contact.BannerView {
-    public String image;
+
+    public int getThisId() {
+        return getArguments().getInt("id");
+    }
+
     private ImageView imageView;
+
 
     @Nullable
     @Override
@@ -24,12 +30,17 @@ public class Banner extends Fragment implements Contact.BannerView {
         View view = inflater.inflate(R.layout.top_image, container, false);
         initId(view);
         loadPic();
+        view.setOnClickListener(v->{
+            Intent intent = new Intent(MyApplication.getContext(), WebActivity.class);
+            intent.putExtra("id", getThisId());
+            MyApplication.getContext().startActivity(intent);
+        });
         return view;
     }
 
-    public static Banner getBannerInstance(String image) {
+    public static Banner getBannerInstance(Bundle arg) {
         Banner banner = new Banner();
-        banner.image = image;
+        banner.setArguments(arg);
         return banner;
     }
 
@@ -41,7 +52,7 @@ public class Banner extends Fragment implements Contact.BannerView {
     @Override
     public void loadPic() {
         Glide.with(MyApplication.getContext())
-                .load(image)
+                .load(getArguments().getString("image"))
                 .into(imageView);
     }
 }

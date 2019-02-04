@@ -2,7 +2,9 @@ package com.example.admin.myapplication.Presenter;
 
 import android.content.Intent;
 import android.icu.text.IDNA;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.admin.myapplication.Model.InfoBean;
@@ -34,15 +37,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     private List<Banner> bannerList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
+    private FragmentManager fm;
 
-    public RecyclerViewAdapter(@NonNull InfoBean infoBean) {
+    public RecyclerViewAdapter(@NonNull InfoBean infoBean, FragmentManager fm) {
+        this.fm = fm;
         mainList.add("今日热闻");
         mainList.addAll(infoBean.getStories());
         dateList.add(infoBean.getDate());
         topList.addAll(infoBean.getTop_stories());
         for (int i = 0; i < topList.size(); i++) {
-            bannerList.add(Banner.getBannerInstance(topList.get(i).getImage()));
+            Bundle bundle = new Bundle();
+            bundle.putString("image",topList.get(i).getImage());
+            bundle.putInt("id",topList.get(i).getId());
+            bannerList.add(Banner.getBannerInstance(bundle));
         }
+        viewPagerAdapter = new ViewPagerAdapter(fm, bannerList);
     }
 
     public void update(InfoBean infoBean) {//用来呼应下拉加载，达到在同一个对象中更新数据目的
@@ -53,7 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     }
 
     public String getDate() {
-        return dateList.get(dateList.size()-1);
+        return dateList.get(dateList.size() - 1);
     }
 
     @Override
@@ -93,12 +102,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
         switch (viewHolder.getItemViewType()) {
             case BANNER_TYPE:
                 BannerHolder bannerHolder = (BannerHolder) viewHolder;
-                bannerHolder.viewPager.setAdapter(new ViewPagerAdapter(new MainActivity().getSupportFragmentManager(), bannerList));
-                bannerHolder.itemView.setOnClickListener(v -> {
-                    Intent intent = new Intent(MyApplication.getContext(), WebActivity.class);
-                    intent.putExtra("id", topList.get(i).getId());
-                    MyApplication.getContext().startActivity(intent);
-                });
+                bannerHolder.viewPager.setAdapter(viewPagerAdapter);
                 break;
             case MAIN_TYPE:
                 MainHolder mainHolder = (MainHolder) viewHolder;

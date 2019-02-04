@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
     private RecyclerView recyclerView;
     private RecyclerViewAdapter recyclerViewAdapter;
     private MainPresenter mainPresenter = new MainPresenter(this);
-    private InfoBean infoBean;
+    private FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +41,13 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
         recyclerView = findViewById(R.id.RV);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (infoBean != null) {
-            recyclerViewAdapter = new RecyclerViewAdapter(infoBean);
+            recyclerViewAdapter = new RecyclerViewAdapter(infoBean, fragmentManager);
             recyclerView.setAdapter(recyclerViewAdapter);
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (!recyclerView.canScrollVertically(1)) {//就很牛逼的判断方法 canSrollVertically -1往下 1往上
+                    if (!recyclerView.canScrollVertically(1)) {//就很牛逼的判断方法 canScrollVertically -1往下 1往上
                         mainPresenter.getBeforeData(recyclerViewAdapter.getDate());
                     }
                 }
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
     }
 
     @Override
-    public void refresh() {
+    public void refresh() {//刷新时候直接清空recyclerView和RVAdapter
         swipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView = null;
             recyclerViewAdapter = null;
@@ -76,8 +76,4 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
         recyclerViewAdapter.update(infoBean);
     }
 
-    @Override
-    public FragmentManager getSupportFragmentManager() {
-        return super.getSupportFragmentManager();
-    }
 }
