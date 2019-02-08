@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.admin.myapplication.Contact;
 import com.example.admin.myapplication.Model.InfoBean;
 import com.example.admin.myapplication.MyApplication;
 import com.example.admin.myapplication.R;
@@ -27,31 +28,43 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter {
+public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact.RecyclerViewAdapter {
 
     private final int BANNER_TYPE = 1;
     private final int DATE_TYPE = 2;
     private final int MAIN_TYPE = 3;
+    private final int FOOTER_TYPE = 4;
     private List<Object> mainList = new ArrayList<>();
-    private List<InfoBean.TopStoriesBean> topList = new ArrayList<>();
-    private List<Banner> bannerList = new ArrayList<>();
     private List<String> dateList = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
-    private FragmentManager fm;
+    private Boolean isCanScrollVertically = true;
+    private MainPresenter mainPresenter;
 
-    public RecyclerViewAdapter(@NonNull InfoBean infoBean, FragmentManager fm) {
-        this.fm = fm;
+    public RecyclerViewAdapter(@NonNull InfoBean infoBean, FragmentManager fm, MainPresenter mainPresenter) {
         mainList.add("今日热闻");
+        this.mainPresenter = mainPresenter;
         mainList.addAll(infoBean.getStories());
         dateList.add(infoBean.getDate());
+        List<InfoBean.TopStoriesBean> topList = new ArrayList<>();
         topList.addAll(infoBean.getTop_stories());
+        List<Banner> bannerList = new ArrayList<>();
         for (int i = 0; i < topList.size(); i++) {
             Bundle bundle = new Bundle();
-            bundle.putString("image",topList.get(i).getImage());
-            bundle.putInt("id",topList.get(i).getId());
+            bundle.putString("image", topList.get(i).getImage());
+            bundle.putInt("id", topList.get(i).getId());
             bannerList.add(Banner.getBannerInstance(bundle));
         }
         viewPagerAdapter = new ViewPagerAdapter(fm, bannerList);
+    }
+
+    public Boolean isThereFooter() {
+        return getItemCount() > mainList.size() + 1;
+    }
+
+    public void changeBoolean() {
+        if (isCanScrollVertically) isCanScrollVertically = false;
+        else isCanScrollVertically = true;
+        if (!isCanScrollVertically) notifyItemInserted(mainList.size() + 1);
     }
 
     public void update(InfoBean infoBean) {//用来呼应下拉加载，达到在同一个对象中更新数据目的
@@ -68,7 +81,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         if (position == 0) return BANNER_TYPE;
-        else if (mainList.get(position - 1) instanceof String) return DATE_TYPE;
+        else if (position < mainList.size() + 1 && mainList.get(position - 1) instanceof String)
+            return DATE_TYPE;
+        else if (!isCanScrollVertically && position == getItemCount() - 1) return FOOTER_TYPE;
         else return MAIN_TYPE;
     }
 
@@ -92,6 +107,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                         LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.rv_date, viewGroup, false)
                 );
                 break;
+            case FOOTER_TYPE:
+                viewHolder = new FooterHolder(
+                        LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.rv_footer, viewGroup, false)
+                );
         }
         return viewHolder;
     }
@@ -121,12 +140,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
                 DateHolder dateHolder = (DateHolder) viewHolder;
                 dateHolder.date.setText((String) mainList.get(i - 1));
                 break;
+            case FOOTER_TYPE:
+                FooterHolder footerHolder = (FooterHolder) viewHolder;
+                footerHolder.itemView.setOnClickListener(v -> {
+                    changeBoolean();
+                    notifyItemRemoved(mainList.size() + 1);
+                    mainPresenter.getBeforeData(getDate());
+                });
+                break;
         }
     }
 
     @Override
     public int getItemCount() {
-        return mainList.size() + 1;
+        if (isCanScrollVertically) return mainList.size() + 1;
+        else return mainList.size() + 2;
     }
 
     class BannerHolder extends RecyclerView.ViewHolder {
@@ -155,6 +183,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.rv_main_text);
             image = (ImageView) itemView.findViewById(R.id.rv_main_image);
+        }
+    }
+
+    class FooterHolder extends RecyclerView.ViewHolder {
+        TextView text;
+
+        public FooterHolder(@NonNull View itemView) {
+            super(itemView);
+            text = itemView.findViewById(R.id.rv_footer_text);
         }
     }
 }

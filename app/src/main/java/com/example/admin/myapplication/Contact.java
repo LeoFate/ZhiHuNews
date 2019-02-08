@@ -22,4 +22,11 @@ public interface Contact {
         void getLatestData();
         void getBeforeData(String date);
     }
+
+    interface RecyclerViewAdapter {
+        Boolean isThereFooter();
+        void changeBoolean();
+        void update(InfoBean infoBean);
+        String getDate();
+    }
 }

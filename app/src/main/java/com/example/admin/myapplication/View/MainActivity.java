@@ -40,14 +40,14 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
         recyclerView = findViewById(R.id.RV);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (infoBean != null) {
-            recyclerViewAdapter = new RecyclerViewAdapter(infoBean, fragmentManager);
+            recyclerViewAdapter = new RecyclerViewAdapter(infoBean, fragmentManager,mainPresenter);
             recyclerView.setAdapter(recyclerViewAdapter);
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (!recyclerView.canScrollVertically(1)) {//就很牛逼的判断方法 canScrollVertically -1往下 1往上
-                        mainPresenter.getBeforeData(recyclerViewAdapter.getDate());
+                    if (!recyclerView.canScrollVertically(1)&&!recyclerViewAdapter.isThereFooter()) {//就很牛逼的判断方法 canScrollVertically -1往下 1往上
+                        recyclerViewAdapter.changeBoolean();
                     }
                 }
             });
