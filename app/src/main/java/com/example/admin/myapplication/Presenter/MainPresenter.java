@@ -14,10 +14,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainPresenter implements Contact.MainPre {
-    private MainActivity mainActivity;
+    private Contact.MainView mainView;
 
-    public MainPresenter(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public MainPresenter(Contact.MainView mainView) {
+        this.mainView = mainView;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class MainPresenter implements Contact.MainPre {
         RetrofitInstance.getInstance().getLatestCall().enqueue(new Callback<InfoBean>() {
             @Override
             public void onResponse(Call<InfoBean> call, Response<InfoBean> response) {
-                mainActivity.initRV(response.body());
+                mainView.initRV(response.body());
             }
 
             @Override
@@ -41,7 +41,7 @@ public class MainPresenter implements Contact.MainPre {
         RetrofitInstance.getInstance().getBeforeCall(date).enqueue(new Callback<InfoBean>() {
             @Override
             public void onResponse(Call<InfoBean> call, Response<InfoBean> response) {
-                mainActivity.loadMore(response.body());
+                mainView.loadMore(response.body());
             }
 
             @Override
