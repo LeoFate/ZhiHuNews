@@ -17,9 +17,6 @@ import com.example.admin.myapplication.R;
 
 public class Banner extends Fragment implements Contact.BannerView {
 
-    public int getThisId() {
-        return getArguments().getInt("id");
-    }
 
     private ImageView imageView;
 
@@ -32,7 +29,7 @@ public class Banner extends Fragment implements Contact.BannerView {
         loadPic();
         view.setOnClickListener(v->{
             Intent intent = new Intent(MyApplication.getContext(), WebActivity.class);
-            intent.putExtra("id", getThisId());
+            intent.putExtra("id", getArguments().getInt("id"));
             MyApplication.getContext().startActivity(intent);
         });
         return view;
@@ -51,7 +48,7 @@ public class Banner extends Fragment implements Contact.BannerView {
 
     @Override
     public void loadPic() {
-        Glide.with(MyApplication.getContext())
+        Glide.with(this)
                 .load(getArguments().getString("image"))
                 .into(imageView);
     }

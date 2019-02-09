@@ -122,6 +122,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
             case BANNER_TYPE:
                 BannerHolder bannerHolder = (BannerHolder) viewHolder;
                 bannerHolder.viewPager.setAdapter(viewPagerAdapter);
+                bannerHolder.viewPager.setOffscreenPageLimit(4);
                 break;
             case MAIN_TYPE:
                 MainHolder mainHolder = (MainHolder) viewHolder;
