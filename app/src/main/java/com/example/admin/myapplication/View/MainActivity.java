@@ -32,25 +32,24 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
     @Override
     public void initId() {
         swipeRefreshLayout = findViewById(R.id.SRL);
+        recyclerView = findViewById(R.id.RV);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewAdapter = new RecyclerViewAdapter(getSupportFragmentManager(), mainPresenter);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(1) && !recyclerViewAdapter.isThereFooter()) {//就很牛逼的判断方法 canScrollVertically -1往下 1往上
+                    recyclerViewAdapter.changeBoolean();
+                }
+            }
+        });
     }
 
     @Override
     public void initRV(InfoBean infoBean) {
-        recyclerView = findViewById(R.id.RV);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        if (infoBean != null) {
-            recyclerViewAdapter = new RecyclerViewAdapter(infoBean, getSupportFragmentManager(), mainPresenter);
-            recyclerView.setAdapter(recyclerViewAdapter);
-            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                    if (!recyclerView.canScrollVertically(1) && !recyclerViewAdapter.isThereFooter()) {//就很牛逼的判断方法 canScrollVertically -1往下 1往上
-                        recyclerViewAdapter.changeBoolean();
-                    }
-                }
-            });
-        }
+        recyclerViewAdapter.inflateData(infoBean);
     }
 
     @Override
@@ -61,8 +60,7 @@ public class MainActivity extends AppCompatActivity implements Contact.MainView 
     @Override
     public void refresh() {//刷新时候直接清空recyclerView和RVAdapter
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            recyclerView = null;
-            recyclerViewAdapter = null;
+            recyclerViewAdapter.refresh();
             getData();
             Toast.makeText(this, "刷新成功！", Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);

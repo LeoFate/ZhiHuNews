@@ -40,9 +40,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
     private Boolean isCanScrollVertically = true;
     private MainPresenter mainPresenter;
 
-    public RecyclerViewAdapter(@NonNull InfoBean infoBean, FragmentManager fm, MainPresenter mainPresenter) {
-        mainList.add("今日热闻");
+    public RecyclerViewAdapter(FragmentManager fm, MainPresenter mainPresenter) {
         this.mainPresenter = mainPresenter;
+        viewPagerAdapter = new ViewPagerAdapter(fm);
+    }
+
+    public void inflateData(InfoBean infoBean) {
+        mainList.add("今日热闻");
         mainList.addAll(infoBean.getStories());
         dateList.add(infoBean.getDate());
         List<InfoBean.TopStoriesBean> topList = new ArrayList<>();
@@ -54,7 +58,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
             bundle.putInt("id", topList.get(i).getId());
             bannerList.add(Banner.getBannerInstance(bundle));
         }
-        viewPagerAdapter = new ViewPagerAdapter(fm, bannerList);
+        viewPagerAdapter.inflateData(bannerList);
+        notifyDataSetChanged();
+    }
+
+    public void refresh() {
+        mainList.clear();
+        dateList.clear();
+        isCanScrollVertically = true;
     }
 
     public Boolean isThereFooter() {
@@ -62,8 +73,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
     }
 
     public void changeBoolean() {
-        if (isCanScrollVertically) isCanScrollVertically = false;
-        else isCanScrollVertically = true;
+        isCanScrollVertically = !isCanScrollVertically;
         if (!isCanScrollVertically) notifyItemInserted(mainList.size() + 1);
     }
 
@@ -161,7 +171,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
     class BannerHolder extends RecyclerView.ViewHolder {
         ViewPager viewPager;
 
-        public BannerHolder(@NonNull View itemView) {
+        BannerHolder(@NonNull View itemView) {
             super(itemView);
             viewPager = (ViewPager) itemView.findViewById(R.id.ViewPager);
         }
@@ -170,7 +180,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
     class DateHolder extends RecyclerView.ViewHolder {
         TextView date;
 
-        public DateHolder(@NonNull View itemView) {
+        DateHolder(@NonNull View itemView) {
             super(itemView);
             date = (TextView) itemView.findViewById(R.id.rv_date_text);
         }
@@ -180,7 +190,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
         TextView title;
         ImageView image;
 
-        public MainHolder(@NonNull View itemView) {
+        MainHolder(@NonNull View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.rv_main_text);
             image = (ImageView) itemView.findViewById(R.id.rv_main_image);
@@ -190,7 +200,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter implements Contact
     class FooterHolder extends RecyclerView.ViewHolder {
         TextView text;
 
-        public FooterHolder(@NonNull View itemView) {
+        FooterHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.rv_footer_text);
         }

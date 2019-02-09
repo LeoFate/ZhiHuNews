@@ -3,6 +3,9 @@ package com.example.admin.myapplication;
 import android.view.View;
 
 import com.example.admin.myapplication.Model.InfoBean;
+import com.example.admin.myapplication.View.Banner;
+
+import java.util.List;
 
 public interface Contact {
     interface BannerView {
@@ -28,5 +31,10 @@ public interface Contact {
         void changeBoolean();//监听，当滑到底部时改变布尔值来添加footer
         void update(InfoBean infoBean);//添加数据
         String getDate();//获取最后一次获取数据中date值
+        void inflateData(InfoBean infoBean);
+        void refresh();
+    }
+    interface ViewPagerAdapter{
+        void inflateData(List<Banner> list);
     }
 }
